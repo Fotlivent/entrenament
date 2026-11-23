@@ -10,6 +10,9 @@
 <meta name="theme-color" content="#0a8f87">
 <meta name="format-detection" content="telephone=no">
 <title>Entrenament matinal</title>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#5a4bd1;--ink:#fff;--soft:rgba(255,255,255,.78);--track:rgba(0,0,0,.22);--tot:#ffd93d;
@@ -79,8 +82,31 @@ body.fi{--bg:#1f9d55}
 .links{display:flex;gap:22px}
 .links button{border:0;background:none;color:#fff;font:700 17px var(--font);text-decoration:underline;opacity:.9;padding:6px 2px}
 #panell{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
-#panell .full{width:100%;background:var(--bg);border-radius:26px 26px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);
- padding:22px 20px calc(env(safe-area-inset-bottom) + 20px);display:flex;flex-direction:column;gap:14px;animation:puja .25s ease-out}
+#panell .full{width:100%;max-height:92dvh;background:var(--bg);border-radius:26px 26px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);
+ padding:20px 16px calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;gap:10px;animation:puja .25s ease-out}
+#panell .cos{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;gap:10px;margin:0 -4px;padding:0 4px 6px}
+#panell h3{font-size:16px;color:var(--soft);text-transform:uppercase;letter-spacing:1px;text-align:left;margin:6px 4px 0}
+.bloc{background:rgba(0,0,0,.14);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.bloc .cap{display:flex;align-items:center;gap:10px}
+.bloc .cap b{font-size:22px;flex:1}.bloc .cap span{font-size:15px;color:var(--soft)}
+.exr{display:flex;gap:8px;align-items:center}
+.exr select{flex:1;min-width:0;height:46px;border:0;border-radius:12px;padding:0 36px 0 12px;font:700 19px var(--font);color:#fff;
+ background:rgba(255,255,255,.18) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 12px center/14px;
+ -webkit-appearance:none;appearance:none}
+.exr select option{color:#000}
+.mini{align-self:flex-start;border:0;background:none;color:#fff;font:700 17px var(--font);text-decoration:underline;padding:4px 2px}
+.x,.del{border:0;background:rgba(255,255,255,.18);color:#fff;font:800 17px var(--font)}
+.x{width:46px;height:46px;border-radius:12px;font-size:24px}
+.del{height:34px;padding:0 14px;border-radius:17px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.duo>div{background:rgba(255,255,255,.1);border-radius:14px;padding:8px 6px;text-align:center}
+.duo small{display:block;font-size:13px;color:var(--soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.duo .stp{justify-content:center;gap:2px}
+.duo .stp button{width:40px;height:40px;font-size:24px}
+.duo .stp output{min-width:56px;font-size:23px}
+.afegeix{height:52px;border:2px dashed rgba(255,255,255,.6);border-radius:18px;background:none;color:#fff;font:800 20px var(--font);letter-spacing:.5px}
+.peu{display:flex;gap:10px}
+#restCfg{height:56px;padding:0 18px;border:0;border-radius:28px;background:rgba(255,255,255,.2);color:#fff;font:700 18px var(--font)}
 @keyframes puja{from{transform:translateY(100%)}}
 #panell h2{font-size:30px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .fila{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;background:rgba(0,0,0,.14);border-radius:18px;padding:12px 14px}
@@ -89,17 +115,20 @@ body.fi{--bg:#1f9d55}
 .stp button{width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;font:800 28px var(--font);line-height:1}
 .stp output{min-width:66px;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
 #durCfg{font-size:16px;color:var(--soft)}
-#tancaCfg{height:56px;border:0;border-radius:28px;background:#fff;color:var(--bg);font:800 22px var(--font);letter-spacing:1px}
+#tancaCfg{flex:1;height:56px;border:0;border-radius:28px;background:#fff;color:var(--bg);font:800 22px var(--font);letter-spacing:1px}
 #avis{font-size:14px;color:var(--soft);line-height:1.25;max-width:340px;margin:0 auto}
 button:active{opacity:.8}
 
 /* tira d'exercicis */
-.strip{display:flex;justify-content:center;gap:8px;padding-top:10px;border-top:1px solid rgba(0,0,0,.12)}
-.strip div{width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,0,0,.22);display:grid;place-items:center;transition:all .3s}
+.strip{overflow-x:auto;scrollbar-width:none;padding-top:10px;border-top:1px solid rgba(0,0,0,.12);margin:0 -16px}
+.strip::-webkit-scrollbar{display:none}
+.strip .fil{display:flex;gap:8px;width:max-content;margin:0 auto;padding:4px 16px}
+.strip .fil>div{flex:0 0 48px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,0,0,.22);display:grid;place-items:center;transition:all .3s}
 .strip svg{width:40px;height:35px;stroke-width:15}
 .strip .act{border-color:#fff;background:rgba(255,255,255,.22);transform:scale(1.1)}
 .strip .seg{border-color:rgba(255,255,255,.6)}
 .strip .fet{opacity:.4}
+.strip .nou{margin-left:10px}
 
 .hide{display:none!important}
 @media (max-height:700px){#avis{display:none}.legend{font-size:12px}#consell{font-size:17px}}
@@ -126,7 +155,7 @@ button:active{opacity:.8}
   <div class="legend"><span><i class="ex"></i>Exercici</span><span><i class="tt"></i>Total</span></div>
   <h1 id="nom">Preparat?</h1>
   <p id="consell"></p>
-  <p id="info">3 blocs × 4 minuts</p>
+  <p id="info"></p>
  </main>
 
  <div class="ctrl">
@@ -141,13 +170,10 @@ button:active{opacity:.8}
 
 <div id="panell" class="hide" role="dialog" aria-modal="true" aria-labelledby="titCfg">
  <div class="full">
-  <h2 id="titCfg">Descansos</h2>
-  <div class="fila"><div><b>Entre exercicis</b><small>Després de cada exercici</small></div>
-   <div class="stp"><button data-k="repos" data-d="-1" aria-label="Menys">−</button><output id="v_repos"></output><button data-k="repos" data-d="1" aria-label="Més">+</button></div></div>
-  <div class="fila"><div><b>Entre blocs</b><small>Descans llarg en canviar de bloc</small></div>
-   <div class="stp"><button data-k="bloc" data-d="-1" aria-label="Menys">−</button><output id="v_bloc"></output><button data-k="bloc" data-d="1" aria-label="Més">+</button></div></div>
+  <h2 id="titCfg">Configuració</h2>
+  <div id="cfgCos" class="cos"></div>
   <p id="durCfg"></p>
-  <button id="tancaCfg">FET</button>
+  <div class="peu"><button id="restCfg">Restaura</button><button id="tancaCfg">FET</button></div>
  </div>
 </div>
 
@@ -173,7 +199,16 @@ const EX={
  rotacio:{nom:"Rotació de tronc",consell:"Amb goma: gira el tronc, malucs quiets",
   extra:`<rect class="pal" x="190" y="30" width="7" height="117" rx="3"/>`,
   a:`<path class="goma" d="M150 60 L192 62"/>${H(92,20)}<path d="M92 36 L92 90 L76 138 M92 90 L108 138 M92 50 L150 60"/>`,
-  b:`<path class="goma" d="M40 62 Q120 74 192 62"/>${H(92,20)}<path d="M92 36 L92 90 L76 138 M92 90 L108 138 M92 50 L40 62"/>`}
+  b:`<path class="goma" d="M40 62 Q120 74 192 62"/>${H(92,20)}<path d="M92 36 L92 90 L76 138 M92 90 L108 138 M92 50 L40 62"/>`},
+ superman:{nom:"Superman",consell:"Estira braços i cames, mirada a terra",
+  a:`${H(42,118)}<path d="M56 128 L128 136 M54 124 L14 104 M128 136 L186 116"/>`,
+  b:`${H(42,128)}<path d="M56 136 L128 138 M54 134 L12 136 M128 138 L186 138"/>`},
+ elevacions:{nom:"Elevacions de cames",consell:"Esquena enganxada a terra, baixa a poc a poc",
+  a:`${H(28,126)}<path d="M42 134 L116 138 L146 70 M48 138 L92 140"/>`,
+  b:`${H(28,126)}<path d="M42 134 L116 138 L186 128 M48 138 L92 140"/>`},
+ ciclista:{nom:"Abdominals de bicicleta",consell:"Colze al genoll contrari, sense estirar el coll",
+  a:`${H(40,100)}<path d="M52 110 L112 136 L182 118 M112 136 L88 102 L122 92 M50 104 L68 90"/>`,
+  b:`${H(40,100)}<path d="M52 110 L112 136 L180 128 M112 136 L104 98 L138 104 M50 104 L74 104"/>`}
 };
 function figura(k,anim){
  const e=EX[k];
@@ -184,23 +219,35 @@ function figura(k,anim){
 }
 Object.keys(EX).forEach(k=>{const i=new Image();i.onload=()=>{EX[k].foto=true;refresca()};i.src=`img/${k}.jpg`;});
 
-/* ---------- Programa ---------- */
-const TREBALL=40,RONDES=2;
-const BLOCS=[["planxa","flexions"],["sentadilles","escaladors"],["salt","rotacio"]];
-const ORDRE=BLOCS.flat();
-// Descansos configurables (es guarden al telèfon)
-const CFG={repos:20,bloc:60};
-const LIM={min:0,max:180,pas:5};
+/* ---------- Programa (configurable, es guarda al telèfon) ---------- */
+const BLOCS_DEF=[
+ {ex:["planxa","flexions"],dur:40,rondes:2},
+ {ex:["sentadilles","escaladors"],dur:40,rondes:2},
+ {ex:["salt","rotacio"],dur:40,rondes:2}];
+const SUGGERITS=[["planxa","superman"],["elevacions","ciclista"]];
+const LIM={repos:[0,180,5],bloc:[0,180,5],dur:[10,180,5],rondes:[1,6,1]};
+const clamp=(v,k)=>Math.min(LIM[k][1],Math.max(LIM[k][0],Math.round(+v)));
+const copia=o=>JSON.parse(JSON.stringify(o));
+let CFG={repos:20,bloc:60,blocs:copia(BLOCS_DEF)};
 try{Object.assign(CFG,JSON.parse(localStorage.getItem("entrenament.cfg")||"{}"));}catch(e){}
+function valida(){
+ CFG.repos=clamp(CFG.repos??20,"repos");CFG.bloc=clamp(CFG.bloc??60,"bloc");
+ CFG.blocs=(Array.isArray(CFG.blocs)?CFG.blocs:[]).map(b=>({
+  ex:(Array.isArray(b.ex)?b.ex:[]).filter(k=>EX[k]).slice(0,4),
+  dur:clamp(b.dur||40,"dur"),rondes:clamp(b.rondes||2,"rondes")})).filter(b=>b.ex.length);
+ if(!CFG.blocs.length)CFG.blocs=copia(BLOCS_DEF);
+}
+valida();
 function desaCfg(){try{localStorage.setItem("entrenament.cfg",JSON.stringify(CFG))}catch(e){}}
 let passos=[],nTreball=0,TOTAL=0;
 function construeix(){
- passos=[{tipus:"repos",dur:10,ex:BLOCS[0][0],text:"Prepara't"}];
- BLOCS.forEach((b,bi)=>{for(let r=0;r<RONDES;r++)b.forEach((e,ei)=>{
-  passos.push({tipus:"treball",dur:TREBALL,ex:e,info:`Bloc ${bi+1} de 3 · Ronda ${r+1} de ${RONDES}`});
-  const last=r==RONDES-1&&ei==1;
-  if(last&&bi==BLOCS.length-1)return;
-  const seg=last?BLOCS[bi+1][0]:b[(ei+1)%2],dur=last?CFG.bloc:CFG.repos;
+ const B=CFG.blocs,nb=B.length;
+ passos=[{tipus:"repos",dur:10,ex:B[0].ex[0],text:"Prepara't"}];
+ B.forEach((b,bi)=>{for(let r=0;r<b.rondes;r++)b.ex.forEach((e,ei)=>{
+  passos.push({tipus:"treball",dur:b.dur,ex:e,bi,ei,info:`Bloc ${bi+1} de ${nb} · Ronda ${r+1} de ${b.rondes}`});
+  const last=r==b.rondes-1&&ei==b.ex.length-1;
+  if(last&&bi==nb-1)return;
+  const seg=last?B[bi+1].ex[0]:b.ex[(ei+1)%b.ex.length],dur=last?CFG.bloc:CFG.repos;
   if(dur>0)passos.push({tipus:"repos",dur,ex:seg,text:last?"Descans llarg":"Descans"});
  });});
  nTreball=0;passos.forEach(p=>{if(p.tipus=="treball")p.num=++nTreball;});
@@ -258,12 +305,17 @@ const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
 const totalRest=()=>rest+passos.slice(idx+1).reduce((s,p)=>s+p.dur,0);
 
 function pintaTira(){
- const p=passos[idx],ara=estat=="inici"?passos[1].ex:p.ex;
- $("strip").innerHTML=ORDRE.map(k=>{
-  const fet=estat=="fi"||(estat=="run"&&!passos.slice(idx).some(q=>q.tipus=="treball"&&q.ex==k));
-  const cls=fet?"fet":k==ara?(p.tipus=="treball"&&estat=="run"?"act":"seg"):"";
-  return `<div class="${cls}" title="${EX[k].nom}">${figura(k,false).replace("<img","<img style='border-radius:50%'")}</div>`;
- }).join("");
+ const p=passos[idx];
+ const ara=estat=="inici"?passos[1]:estat=="run"?passos.slice(idx).find(q=>q.tipus=="treball"):null;
+ const html=CFG.blocs.map((b,bi)=>b.ex.map((k,ei)=>{
+  const fet=estat=="fi"||(estat=="run"&&!passos.slice(idx).some(q=>q.tipus=="treball"&&q.bi==bi&&q.ei==ei));
+  const es=ara&&ara.bi==bi&&ara.ei==ei;
+  const cls=(fet?"fet":es?(p.tipus=="treball"&&estat=="run"?"act":"seg"):"")+(ei==0&&bi>0?" nou":"");
+  return `<div class="${cls}" title="Bloc ${bi+1}: ${EX[k].nom}">${figura(k,false).replace("<img","<img style='border-radius:50%'")}</div>`;
+ }).join("")).join("");
+ const st=$("strip");st.innerHTML=`<div class="fil">${html}</div>`;
+ const a=st.querySelector(".act,.seg");
+ if(a)st.scrollTo({left:a.offsetLeft-st.clientWidth/2+a.offsetWidth/2,behavior:"smooth"});
 }
 function mostra(){
  const p=estat=="inici"?passos[1]:passos[idx],e=EX[p.ex],treb=p.tipus=="treball";
@@ -275,7 +327,7 @@ function mostra(){
  }else{
   $("fig").innerHTML=figura(p.ex,treb&&estat=="run");
   $("fig").classList.toggle("dim",!treb);
-  if(estat=="inici"){$("nom").textContent="Preparat?";$("consell").textContent=`Primer: ${e.nom}`;$("info").textContent=`3 blocs · ${nTreball} exercicis · ${Math.round(TOTAL/60)} min`;$("pas").textContent="Total";}
+  if(estat=="inici"){$("nom").textContent="Preparat?";$("consell").textContent=`Primer: ${e.nom}`;$("info").textContent=`${CFG.blocs.length} blocs · ${nTreball} exercicis · ${Math.round(TOTAL/60)} min`;$("pas").textContent="Total";}
   else if(treb){$("nom").textContent=e.nom;$("consell").textContent=e.consell;$("info").textContent=p.info;$("pas").textContent=`Exercici ${p.num} de ${nTreball}`;}
   else{$("nom").textContent=p.text;$("consell").textContent=`Següent: ${e.nom}`;$("info").textContent=e.consell;
    const nx=passos.slice(idx).find(q=>q.tipus=="treball");$("pas").textContent=nx?`Descans · després ${nx.num}/${nTreball}`:"Descans";}
@@ -355,20 +407,45 @@ $("reset").onclick=()=>{if(estat=="run"&&confirm("Vols aturar i reiniciar l'entr
 $("prova").onclick=()=>{iniciaSo();beep(2000,.3);setTimeout(()=>diu(veu?`Hola! Aquesta és la veu de l'entrenament.`:"Hola! Prova de so."),450);};
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState=="visible"){if(ctx&&ctx.state!="running")ctx.resume();if(estat=="run")demanaWake();}});
 
-/* ---------- Configuració dels descansos ---------- */
-const seg=v=>v?`${v} s`:"cap";
+/* ---------- Configuració: descansos i blocs ---------- */
+const segs=v=>v?`${v} s`:"cap";
+const stp=(path,val,txt)=>`<div class="stp"><button data-a="step" data-p="${path}" data-d="-1" aria-label="Menys">−</button><output>${txt}</output><button data-a="step" data-p="${path}" data-d="1" aria-label="Més">+</button></div>`;
+const opcions=sel=>Object.keys(EX).map(k=>`<option value="${k}"${k==sel?" selected":""}>${EX[k].nom}</option>`).join("");
 function pintaCfg(){
- $("resCfg").textContent=`Descansos: ${seg(CFG.repos)} · ${seg(CFG.bloc)}`;
- $("v_repos").textContent=seg(CFG.repos);$("v_bloc").textContent=seg(CFG.bloc);
- $("durCfg").textContent=`Durada total: ${mmss(TOTAL)}`;
+ $("resCfg").textContent=`Configura · ${CFG.blocs.length} blocs`;
+ const nb=CFG.blocs.length;
+ $("cfgCos").innerHTML=`<h3>Descansos</h3>
+  <div class="fila"><div><b>Entre exercicis</b><small>Després de cada exercici</small></div>${stp("repos",CFG.repos,segs(CFG.repos))}</div>
+  <div class="fila"><div><b>Entre blocs</b><small>Descans llarg en canviar de bloc</small></div>${stp("bloc",CFG.bloc,segs(CFG.bloc))}</div>
+  <h3>Blocs</h3>`+CFG.blocs.map((b,bi)=>`<div class="bloc">
+   <div class="cap"><b>Bloc ${bi+1}</b><span>${b.rondes} × ${b.ex.length} exercicis</span>${nb>1?`<button class="del" data-a="delB" data-b="${bi}">Elimina</button>`:""}</div>
+   ${b.ex.map((k,ei)=>`<div class="exr"><select data-b="${bi}" data-e="${ei}" aria-label="Exercici ${ei+1} del bloc ${bi+1}">${opcions(k)}</select>${b.ex.length>1?`<button class="x" data-a="delE" data-b="${bi}" data-e="${ei}" aria-label="Treu l'exercici">×</button>`:""}</div>`).join("")}
+   ${b.ex.length<4?`<button class="mini" data-a="addE" data-b="${bi}">+ Afegeix exercici</button>`:""}
+   <div class="duo"><div><small>Durada exercici</small>${stp(`b.${bi}.dur`,b.dur,`${b.dur} s`)}</div><div><small>Rondes</small>${stp(`b.${bi}.rondes`,b.rondes,b.rondes)}</div></div>
+  </div>`).join("")+`<button class="afegeix" data-a="addB">+ Afegeix bloc</button>`;
+ $("durCfg").textContent=`Durada total: ${mmss(TOTAL)} · ${nTreball} exercicis`;
 }
+function canviCfg(){valida();desaCfg();construeix();if(estat!="run"){estat="inici";mostra();}pintaCfg();}
 $("obreCfg").onclick=()=>{if(estat=="run")return;pintaCfg();$("panell").classList.remove("hide");};
 $("tancaCfg").onclick=()=>$("panell").classList.add("hide");
 $("panell").onclick=e=>{if(e.target.id=="panell")$("panell").classList.add("hide");};
-document.querySelectorAll(".stp button").forEach(b=>b.onclick=()=>{
- const k=b.dataset.k;CFG[k]=Math.min(LIM.max,Math.max(LIM.min,CFG[k]+LIM.pas*b.dataset.d));
- desaCfg();construeix();if(estat!="run"){estat="inici";mostra();}pintaCfg();
+$("restCfg").onclick=()=>{if(confirm("Vols tornar a la configuració inicial?")){CFG={repos:20,bloc:60,blocs:copia(BLOCS_DEF)};canviCfg();}};
+$("cfgCos").addEventListener("click",e=>{
+ const b=e.target.closest("button[data-a]");if(!b)return;
+ const a=b.dataset.a,bi=+b.dataset.b,ei=+b.dataset.e;
+ if(a=="step"){const [x,i,k]=b.dataset.p.split("."),d=+b.dataset.d;
+  if(x=="b"){const k2=k;CFG.blocs[+i][k2]=clamp(CFG.blocs[+i][k2]+LIM[k2][2]*d,k2);}
+  else CFG[x]=clamp(CFG[x]+LIM[x][2]*d,x);}
+ else if(a=="addB"){const ja=CFG.blocs.map(q=>q.ex.join());
+  const nou=SUGGERITS.find(sg=>!ja.includes(sg.join()))||SUGGERITS[0];
+  CFG.blocs.push({ex:[...nou],dur:40,rondes:2});}
+ else if(a=="delB"){if(!confirm(`Vols eliminar el bloc ${bi+1}?`))return;CFG.blocs.splice(bi,1);}
+ else if(a=="addE")CFG.blocs[bi].ex.push(Object.keys(EX).find(k=>!CFG.blocs[bi].ex.includes(k))||"planxa");
+ else if(a=="delE")CFG.blocs[bi].ex.splice(ei,1);
+ canviCfg();
+ if(a=="addB")setTimeout(()=>{const c=$("cfgCos");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})},30);
 });
+$("cfgCos").addEventListener("change",e=>{const t=e.target;if(t.tagName!="SELECT")return;CFG.blocs[+t.dataset.b].ex[+t.dataset.e]=t.value;canviCfg();});
 pintaCfg();mostra();requestAnimationFrame(dibuixa);
 </script>
 </body>
