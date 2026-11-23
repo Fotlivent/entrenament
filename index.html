@@ -76,7 +76,20 @@ body.fi{--bg:#1f9d55}
 #start{width:100%;max-width:340px;height:62px;border:0;border-radius:31px;background:#fff;color:var(--bg);
  font:800 26px var(--font);letter-spacing:1px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
 #salta{height:46px;padding:0 26px;border:0;border-radius:23px;background:rgba(255,255,255,.2);color:#fff;font:700 19px var(--font);letter-spacing:.5px}
-#prova{border:0;background:none;color:#fff;font:700 17px var(--font);text-decoration:underline;opacity:.9;padding:4px}
+.links{display:flex;gap:22px}
+.links button{border:0;background:none;color:#fff;font:700 17px var(--font);text-decoration:underline;opacity:.9;padding:6px 2px}
+#panell{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
+#panell .full{width:100%;background:var(--bg);border-radius:26px 26px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);
+ padding:22px 20px calc(env(safe-area-inset-bottom) + 20px);display:flex;flex-direction:column;gap:14px;animation:puja .25s ease-out}
+@keyframes puja{from{transform:translateY(100%)}}
+#panell h2{font-size:30px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.fila{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;background:rgba(0,0,0,.14);border-radius:18px;padding:12px 14px}
+.fila b{display:block;font-size:21px}.fila small{display:block;font-size:14px;color:var(--soft);font-weight:600}
+.stp{display:flex;align-items:center;gap:6px}
+.stp button{width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;font:800 28px var(--font);line-height:1}
+.stp output{min-width:66px;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+#durCfg{font-size:16px;color:var(--soft)}
+#tancaCfg{height:56px;border:0;border-radius:28px;background:#fff;color:var(--bg);font:800 22px var(--font);letter-spacing:1px}
 #avis{font-size:14px;color:var(--soft);line-height:1.25;max-width:340px;margin:0 auto}
 button:active{opacity:.8}
 
@@ -119,11 +132,23 @@ button:active{opacity:.8}
  <div class="ctrl">
   <button id="start">▶ COMENÇAR</button>
   <button id="salta" class="hide">Salta ⏭</button>
-  <button id="prova">🔊 Prova el so</button>
+  <div class="links" id="links"><button id="obreCfg">⚙ <span id="resCfg"></span></button><button id="prova">🔊 Prova el so</button></div>
  </div>
  <p id="avis">Treu el mode silenci, puja el volum al màxim i treu la funda si tapa l'altaveu de baix.</p>
 
  <footer class="strip" id="strip"></footer>
+</div>
+
+<div id="panell" class="hide" role="dialog" aria-modal="true" aria-labelledby="titCfg">
+ <div class="full">
+  <h2 id="titCfg">Descansos</h2>
+  <div class="fila"><div><b>Entre exercicis</b><small>Després de cada exercici</small></div>
+   <div class="stp"><button data-k="repos" data-d="-1" aria-label="Menys">−</button><output id="v_repos"></output><button data-k="repos" data-d="1" aria-label="Més">+</button></div></div>
+  <div class="fila"><div><b>Entre blocs</b><small>Descans llarg en canviar de bloc</small></div>
+   <div class="stp"><button data-k="bloc" data-d="-1" aria-label="Menys">−</button><output id="v_bloc"></output><button data-k="bloc" data-d="1" aria-label="Més">+</button></div></div>
+  <p id="durCfg"></p>
+  <button id="tancaCfg">FET</button>
+ </div>
 </div>
 
 <script>
@@ -160,19 +185,28 @@ function figura(k,anim){
 Object.keys(EX).forEach(k=>{const i=new Image();i.onload=()=>{EX[k].foto=true;refresca()};i.src=`img/${k}.jpg`;});
 
 /* ---------- Programa ---------- */
-const TREBALL=40,REPOS=20,REPOS_BLOC=60,RONDES=2;
+const TREBALL=40,RONDES=2;
 const BLOCS=[["planxa","flexions"],["sentadilles","escaladors"],["salt","rotacio"]];
-const passos=[{tipus:"repos",dur:10,ex:BLOCS[0][0],text:"Prepara't"}];
-BLOCS.forEach((b,bi)=>{for(let r=0;r<RONDES;r++)b.forEach((e,ei)=>{
- passos.push({tipus:"treball",dur:TREBALL,ex:e,info:`Bloc ${bi+1} de 3 · Ronda ${r+1} de ${RONDES}`});
- const last=r==RONDES-1&&ei==1;
- if(last&&bi==BLOCS.length-1)return;
- const seg=last?BLOCS[bi+1][0]:b[(ei+1)%2];
- passos.push({tipus:"repos",dur:last?REPOS_BLOC:REPOS,ex:seg,text:last?"Descans llarg":"Descans"});
-});});
-let nTreball=0;passos.forEach(p=>{if(p.tipus=="treball")p.num=++nTreball;});
-const TOTAL=passos.reduce((s,p)=>s+p.dur,0);
 const ORDRE=BLOCS.flat();
+// Descansos configurables (es guarden al telèfon)
+const CFG={repos:20,bloc:60};
+const LIM={min:0,max:180,pas:5};
+try{Object.assign(CFG,JSON.parse(localStorage.getItem("entrenament.cfg")||"{}"));}catch(e){}
+function desaCfg(){try{localStorage.setItem("entrenament.cfg",JSON.stringify(CFG))}catch(e){}}
+let passos=[],nTreball=0,TOTAL=0;
+function construeix(){
+ passos=[{tipus:"repos",dur:10,ex:BLOCS[0][0],text:"Prepara't"}];
+ BLOCS.forEach((b,bi)=>{for(let r=0;r<RONDES;r++)b.forEach((e,ei)=>{
+  passos.push({tipus:"treball",dur:TREBALL,ex:e,info:`Bloc ${bi+1} de 3 · Ronda ${r+1} de ${RONDES}`});
+  const last=r==RONDES-1&&ei==1;
+  if(last&&bi==BLOCS.length-1)return;
+  const seg=last?BLOCS[bi+1][0]:b[(ei+1)%2],dur=last?CFG.bloc:CFG.repos;
+  if(dur>0)passos.push({tipus:"repos",dur,ex:seg,text:last?"Descans llarg":"Descans"});
+ });});
+ nTreball=0;passos.forEach(p=>{if(p.tipus=="treball")p.num=++nTreball;});
+ TOTAL=passos.reduce((s,p)=>s+p.dur,0);
+}
+construeix();
 
 /* ---------- So (optimitzat per a l'altaveu de l'iPhone) ---------- */
 let ctx,bus;
@@ -241,7 +275,7 @@ function mostra(){
  }else{
   $("fig").innerHTML=figura(p.ex,treb&&estat=="run");
   $("fig").classList.toggle("dim",!treb);
-  if(estat=="inici"){$("nom").textContent="Preparat?";$("consell").textContent=`Primer: ${e.nom}`;$("info").textContent=`3 blocs × 4 minuts · ${nTreball} exercicis`;$("pas").textContent="Total";}
+  if(estat=="inici"){$("nom").textContent="Preparat?";$("consell").textContent=`Primer: ${e.nom}`;$("info").textContent=`3 blocs · ${nTreball} exercicis · ${Math.round(TOTAL/60)} min`;$("pas").textContent="Total";}
   else if(treb){$("nom").textContent=e.nom;$("consell").textContent=e.consell;$("info").textContent=p.info;$("pas").textContent=`Exercici ${p.num} de ${nTreball}`;}
   else{$("nom").textContent=p.text;$("consell").textContent=`Següent: ${e.nom}`;$("info").textContent=e.consell;
    const nx=passos.slice(idx).find(q=>q.tipus=="treball");$("pas").textContent=nx?`Descans · després ${nx.num}/${nTreball}`:"Descans";}
@@ -296,7 +330,7 @@ function reinicia(){
  estat="inici";clearInterval(loop);loop=null;pausat=false;speechSynthesis.cancel();
  document.body.classList.remove("compte","pausat");$("app").classList.remove("pausat");
  $("start").classList.remove("hide");$("start").textContent="▶ COMENÇAR";$("salta").classList.add("hide");
- $("prova").classList.remove("hide");$("avis").classList.remove("hide");
+ $("links").classList.remove("hide");$("avis").classList.remove("hide");
  $("pausa").disabled=true;$("reset").disabled=true;iconaPausa();mostra();
  if(wake)wake.release().catch(()=>{});
 }
@@ -306,7 +340,7 @@ async function demanaWake(){try{wake=await navigator.wakeLock.request("screen")}
 $("start").onclick=()=>{
  iniciaSo();diu(" ");demanaWake();
  estat="run";pausat=false;iconaPausa();
- $("start").classList.add("hide");$("salta").classList.remove("hide");$("prova").classList.add("hide");$("avis").classList.add("hide");
+ $("start").classList.add("hide");$("salta").classList.remove("hide");$("links").classList.add("hide");$("avis").classList.add("hide");
  $("pausa").disabled=false;$("reset").disabled=false;
  inicia(0);clearInterval(loop);loop=setInterval(rellotge,100);
 };
@@ -321,7 +355,21 @@ $("reset").onclick=()=>{if(estat=="run"&&confirm("Vols aturar i reiniciar l'entr
 $("prova").onclick=()=>{iniciaSo();beep(2000,.3);setTimeout(()=>diu(veu?`Hola! Aquesta és la veu de l'entrenament.`:"Hola! Prova de so."),450);};
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState=="visible"){if(ctx&&ctx.state!="running")ctx.resume();if(estat=="run")demanaWake();}});
 
-mostra();requestAnimationFrame(dibuixa);
+/* ---------- Configuració dels descansos ---------- */
+const seg=v=>v?`${v} s`:"cap";
+function pintaCfg(){
+ $("resCfg").textContent=`Descansos: ${seg(CFG.repos)} · ${seg(CFG.bloc)}`;
+ $("v_repos").textContent=seg(CFG.repos);$("v_bloc").textContent=seg(CFG.bloc);
+ $("durCfg").textContent=`Durada total: ${mmss(TOTAL)}`;
+}
+$("obreCfg").onclick=()=>{if(estat=="run")return;pintaCfg();$("panell").classList.remove("hide");};
+$("tancaCfg").onclick=()=>$("panell").classList.add("hide");
+$("panell").onclick=e=>{if(e.target.id=="panell")$("panell").classList.add("hide");};
+document.querySelectorAll(".stp button").forEach(b=>b.onclick=()=>{
+ const k=b.dataset.k;CFG[k]=Math.min(LIM.max,Math.max(LIM.min,CFG[k]+LIM.pas*b.dataset.d));
+ desaCfg();construeix();if(estat!="run"){estat="inici";mostra();}pintaCfg();
+});
+pintaCfg();mostra();requestAnimationFrame(dibuixa);
 </script>
 </body>
 </html>
