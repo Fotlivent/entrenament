@@ -4,90 +4,324 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Entrenament">
+<meta name="theme-color" content="#0a8f87">
+<meta name="format-detection" content="telephone=no">
 <title>Entrenament matinal</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,Helvetica,sans-serif;background:#111;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 12px 20px;text-align:center}
-h1{font-size:22px;margin:6px 0 4px}
-#info{font-size:16px;color:#aaa;min-height:20px}
-#fase{font-size:30px;font-weight:800;margin:8px 0;min-height:38px}
-#imgbox{width:100%;max-width:420px;aspect-ratio:4/3;background:#fff;border-radius:18px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-#imgbox img{width:100%;height:100%;object-fit:contain}
-#temps{font-size:110px;font-weight:900;line-height:1;margin:10px 0;font-variant-numeric:tabular-nums}
-#seg{font-size:18px;color:#ccc;min-height:24px;max-width:420px}
-#barra{width:100%;max-width:420px;height:10px;background:#333;border-radius:5px;margin:10px 0;overflow:hidden}
-#prog{height:100%;width:0;background:#2ecc71}
-.btns{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center}
-button{font-size:20px;font-weight:700;padding:16px 22px;border:0;border-radius:14px;background:#2ecc71;color:#000}
-button.sec{background:#444;color:#fff}
-.treball #fase{color:#2ecc71}.repos #fase{color:#f39c12}
-.avis{font-size:14px;color:#f39c12;max-width:420px;margin-top:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#5a4bd1;--ink:#fff;--soft:rgba(255,255,255,.78);--track:rgba(0,0,0,.22);--tot:#ffd93d;
+ --R:min(82vw,40vh,340px);
+ --font:"Avenir Next Condensed","AvenirNextCondensed-Heavy","Arial Narrow","Roboto Condensed",system-ui,sans-serif}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-family:var(--font);font-weight:700;color:var(--ink);text-align:center;
+ background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,0) 40%,rgba(0,0,0,.20) 100%),var(--bg);
+ transition:background-color .6s ease;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body.treball{--bg:#0a8f87}
+body.repos,body.prep{--bg:#5a4bd1}
+body.fi{--bg:#1f9d55}
+#app{height:100dvh;display:flex;flex-direction:column;
+ padding:calc(env(safe-area-inset-top) + 6px) 16px calc(env(safe-area-inset-bottom) + 8px)}
+
+/* barra superior */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:64px}
+.circ{width:54px;height:54px;flex:0 0 54px;border-radius:50%;border:0;background:rgba(255,255,255,.2);
+ box-shadow:0 6px 16px rgba(0,0,0,.15);display:grid;place-items:center;color:#fff}
+.circ svg{width:24px;height:24px}
+.circ:disabled{opacity:.35}
+.circ:active{transform:scale(.94)}
+.tot{flex:1;line-height:1}
+#total{font-size:44px;font-weight:800;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+#pas{font-size:17px;color:var(--soft);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+
+/* anells */
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0}
+.rings{position:relative;width:var(--R);height:var(--R)}
+.rings>svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.rings circle{fill:none}
+.trk{stroke:var(--track)}
+#ringTot{stroke:var(--tot);stroke-linecap:round}
+#ringEx{stroke:#fff;stroke-linecap:round}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:calc(var(--R)*.02)}
+#fig{width:calc(var(--R)*.42);aspect-ratio:200/172;transition:opacity .3s}
+#fig.dim{opacity:.55}
+#fig img.foto{width:100%;height:100%;object-fit:cover;border-radius:18px}
+#temps{font-size:calc(var(--R)*.24);font-weight:800;line-height:.95;font-variant-numeric:tabular-nums;margin-top:2px}
+.compte #temps{animation:pols 1s ease-out infinite}
+@keyframes pols{0%{transform:scale(1.18)}60%{transform:scale(1)}}
+.legend{display:flex;gap:16px;font-size:14px;color:var(--soft);letter-spacing:.5px;text-transform:uppercase}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.legend .ex{background:#fff}.legend .tt{background:var(--tot)}
+
+/* figures */
+.figsvg{width:100%;height:100%;overflow:visible;stroke:#fff;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.figsvg circle{fill:#fff;stroke:none}
+.figsvg .terra{stroke:rgba(255,255,255,.35);stroke-width:4}
+.figsvg .goma{stroke:var(--tot);stroke-width:5}
+.figsvg .pal{fill:rgba(255,255,255,.55);stroke:none}
+.anim .pa{animation:vis 1.6s infinite}
+.anim .pb{animation:vis 1.6s infinite -.8s}
+@keyframes vis{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+.pausat .anim g{animation-play-state:paused}
+
+/* textos */
+#nom{font-size:clamp(34px,10.5vw,46px);font-weight:800;line-height:1;letter-spacing:.5px;text-transform:uppercase;margin-top:8px}
+#consell{font-size:19px;color:var(--soft);line-height:1.2;min-height:23px;max-width:340px}
+#info{font-size:15px;color:var(--soft);letter-spacing:.6px;text-transform:uppercase;opacity:.85}
+
+/* controls */
+.ctrl{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 10px;min-height:60px;justify-content:center}
+#start{width:100%;max-width:340px;height:62px;border:0;border-radius:31px;background:#fff;color:var(--bg);
+ font:800 26px var(--font);letter-spacing:1px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+#salta{height:46px;padding:0 26px;border:0;border-radius:23px;background:rgba(255,255,255,.2);color:#fff;font:700 19px var(--font);letter-spacing:.5px}
+#prova{border:0;background:none;color:#fff;font:700 17px var(--font);text-decoration:underline;opacity:.9;padding:4px}
+#avis{font-size:14px;color:var(--soft);line-height:1.25;max-width:340px;margin:0 auto}
+button:active{opacity:.8}
+
+/* tira d'exercicis */
+.strip{display:flex;justify-content:center;gap:8px;padding-top:10px;border-top:1px solid rgba(0,0,0,.12)}
+.strip div{width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,0,0,.22);display:grid;place-items:center;transition:all .3s}
+.strip svg{width:40px;height:35px;stroke-width:15}
+.strip .act{border-color:#fff;background:rgba(255,255,255,.22);transform:scale(1.1)}
+.strip .seg{border-color:rgba(255,255,255,.6)}
+.strip .fet{opacity:.4}
+
+.hide{display:none!important}
+@media (max-height:700px){#avis{display:none}.legend{font-size:12px}#consell{font-size:17px}}
 </style>
 </head>
-<body>
-<h1>Entrenament matinal</h1>
-<div id="info">3 blocs × 4 minuts</div>
-<div id="fase">Preparat?</div>
-<div id="imgbox"><img id="img" alt=""></div>
-<div id="temps">--</div>
-<div id="seg"></div>
-<div id="barra"><div id="prog"></div></div>
-<div class="btns">
-<button id="start">▶ COMENÇAR</button>
-<button id="pausa" class="sec" style="display:none">⏸ Pausa</button>
-<button id="salta" class="sec" style="display:none">⏭ Salta</button>
+<body class="prep">
+<div id="app">
+ <header class="top">
+  <button id="reset" class="circ" aria-label="Reinicia" disabled><svg viewBox="0 0 24 24" stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  <div class="tot"><div id="total">--:--</div><div id="pas">Total</div></div>
+  <button id="pausa" class="circ" aria-label="Pausa" disabled><svg id="icPausa" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg></button>
+ </header>
+
+ <main class="stage">
+  <div class="rings">
+   <svg viewBox="0 0 300 300" aria-hidden="true">
+    <circle class="trk" cx="150" cy="150" r="138" stroke-width="18"/>
+    <circle id="ringTot" cx="150" cy="150" r="138" stroke-width="12" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/>
+    <circle class="trk" cx="150" cy="150" r="112" stroke-width="16"/>
+    <circle id="ringEx" cx="150" cy="150" r="112" stroke-width="10" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/>
+   </svg>
+   <div class="center"><div id="fig"></div><div id="temps">40</div></div>
+  </div>
+  <div class="legend"><span><i class="ex"></i>Exercici</span><span><i class="tt"></i>Total</span></div>
+  <h1 id="nom">Preparat?</h1>
+  <p id="consell"></p>
+  <p id="info">3 blocs × 4 minuts</p>
+ </main>
+
+ <div class="ctrl">
+  <button id="start">▶ COMENÇAR</button>
+  <button id="salta" class="hide">Salta ⏭</button>
+  <button id="prova">🔊 Prova el so</button>
+ </div>
+ <p id="avis">Treu el mode silenci, puja el volum al màxim i treu la funda si tapa l'altaveu de baix.</p>
+
+ <footer class="strip" id="strip"></footer>
 </div>
-<p class="avis">🔊 Treu el mode silenci de l'iPhone (interruptor lateral) i puja el volum al màxim abans de començar.</p>
+
 <script>
-// Fotos: si poses imatges a la carpeta img/ amb aquests noms (planxa.jpg, flexions.jpg...), es mostren. Si no, surt el dibuix.
-const C='stroke="#222" stroke-width="9" stroke-linecap="round" fill="none"';
-const H=(x,y)=>`<circle cx="${x}" cy="${y}" r="14" fill="#222"/>`;
-const G=`<line x1="10" y1="250" x2="390" y2="250" stroke="#bbb" stroke-width="4"/>`;
-const svg=b=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="#fff"/>${G}${b}</svg>`);
+/* ---------- Exercicis ----------
+   Fotos opcionals: posa img/planxa.jpg, img/flexions.jpg... i es mostraran en lloc del dibuix. */
+const H=(x,y)=>`<circle cx="${x}" cy="${y}" r="13"/>`;
 const EX={
- planxa:{nom:"Planxa",consell:"Cos recte, abdominals tensos",img:"img/planxa.jpg",svg:svg(`${H(90,180)}<path ${C} d="M105 188 L320 225 M320 225 L345 248 M120 192 L115 248 L160 248"/>`)},
- flexions:{nom:"Flexions",consell:"Pots fer-les amb genolls a terra",img:"img/flexions.jpg",svg:svg(`${H(95,150)}<path ${C} d="M110 160 L330 235 L350 248 M125 165 L125 248"/>`)},
- sentadilles:{nom:"Sentadilles",consell:"Talons a terra, esquena recta",img:"img/sentadilles.jpg",svg:svg(`${H(200,70)}<path ${C} d="M200 85 L190 160 L240 175 L225 248 M190 160 L230 250 M198 110 L270 115"/>`)},
- escaladors:{nom:"Escaladors",consell:"Porta els genolls al pit alternant",img:"img/escaladors.jpg",svg:svg(`${H(90,150)}<path ${C} d="M105 160 L260 195 L340 248 M260 195 L190 215 L200 248 M120 165 L120 248"/>`)},
- salt:{nom:"Salt en cuclilles",consell:"Aterra suau, genolls flexionats",img:"img/salt.jpg",svg:svg(`${H(200,45)}<path ${C} d="M200 60 L200 140 L180 190 L185 215 M200 140 L220 190 L215 215 M200 80 L160 30 M200 80 L240 30"/><path stroke="#2ecc71" stroke-width="5" fill="none" d="M150 235 L250 235"/>`)},
- rotacio:{nom:"Rotació de tronc amb goma",consell:"Gira el tronc, malucs quiets",img:"img/rotacio.jpg",svg:svg(`${H(200,70)}<path ${C} d="M200 85 L200 170 L175 248 M200 170 L225 248 M200 110 L300 120 M200 110 L300 130"/><path stroke="#e67e22" stroke-width="5" fill="none" d="M300 125 L385 125"/>`)}
+ planxa:{nom:"Planxa",consell:"Cos recte, abdominals tensos",
+  a:`${H(36,100)}<path d="M52 108 L128 120 L182 136 M56 110 L58 138 L86 138"/>`},
+ flexions:{nom:"Flexions",consell:"Pots fer-les amb genolls a terra",
+  a:`${H(38,70)}<path d="M54 78 L182 136 M62 82 L62 138"/>`,
+  b:`${H(36,98)}<path d="M52 106 L182 136 M64 110 L90 120 L68 138"/>`},
+ sentadilles:{nom:"Sentadilles",consell:"Talons a terra, esquena recta",
+  a:`${H(100,20)}<path d="M100 36 L100 88 L92 138 M100 88 L108 138 M100 48 L146 52"/>`,
+  b:`${H(82,54)}<path d="M86 68 L76 106 L122 108 L116 138 M84 76 L140 74"/>`},
+ escaladors:{nom:"Escaladors",consell:"Porta els genolls al pit alternant",
+  a:`${H(36,74)}<path d="M52 82 L128 106 L182 134 M128 106 L94 112 L104 136 M58 86 L58 138"/>`,
+  b:`${H(36,74)}<path d="M52 82 L128 106 L176 136 M128 106 L150 122 L178 132 M58 86 L58 138"/>`},
+ salt:{nom:"Salt en cuclilles",consell:"Aterra suau, genolls flexionats",
+  a:`${H(82,54)}<path d="M86 68 L76 106 L122 108 L116 138 M84 76 L58 102"/>`,
+  b:`${H(100,8)}<path d="M100 22 L100 76 L90 116 M100 76 L112 116 M100 36 L80 2 M100 36 L120 2"/>`},
+ rotacio:{nom:"Rotació de tronc",consell:"Amb goma: gira el tronc, malucs quiets",
+  extra:`<rect class="pal" x="190" y="30" width="7" height="117" rx="3"/>`,
+  a:`<path class="goma" d="M150 60 L192 62"/>${H(92,20)}<path d="M92 36 L92 90 L76 138 M92 90 L108 138 M92 50 L150 60"/>`,
+  b:`<path class="goma" d="M40 62 Q120 74 192 62"/>${H(92,20)}<path d="M92 36 L92 90 L76 138 M92 90 L108 138 M92 50 L40 62"/>`}
 };
+function figura(k,anim){
+ const e=EX[k];
+ if(e.foto)return `<img class="foto" src="img/${k}.jpg" alt="${e.nom}">`;
+ const mov=anim&&e.b;
+ const cos=mov?`<g class="pa">${e.a}</g><g class="pb">${e.b}</g>`:`<g>${e.a}</g>`;
+ return `<svg class="figsvg${mov?" anim":""}" viewBox="0 -12 200 172"><line class="terra" x1="8" y1="147" x2="192" y2="147"/>${e.extra||""}${cos}</svg>`;
+}
+Object.keys(EX).forEach(k=>{const i=new Image();i.onload=()=>{EX[k].foto=true;refresca()};i.src=`img/${k}.jpg`;});
+
+/* ---------- Programa ---------- */
 const TREBALL=40,REPOS=20,REPOS_BLOC=60,RONDES=2;
 const BLOCS=[["planxa","flexions"],["sentadilles","escaladors"],["salt","rotacio"]];
-let passos=[{tipus:"repos",dur:10,ex:BLOCS[0][0],text:"Prepara't",info:"Comencem"}];
+const passos=[{tipus:"repos",dur:10,ex:BLOCS[0][0],text:"Prepara't"}];
 BLOCS.forEach((b,bi)=>{for(let r=0;r<RONDES;r++)b.forEach((e,ei)=>{
  passos.push({tipus:"treball",dur:TREBALL,ex:e,info:`Bloc ${bi+1} de 3 · Ronda ${r+1} de ${RONDES}`});
  const last=r==RONDES-1&&ei==1;
  if(last&&bi==BLOCS.length-1)return;
  const seg=last?BLOCS[bi+1][0]:b[(ei+1)%2];
- passos.push({tipus:"repos",dur:last?REPOS_BLOC:REPOS,ex:seg,text:last?"Descans entre blocs":"Descans",info:"Següent: "+EX[seg].nom});
+ passos.push({tipus:"repos",dur:last?REPOS_BLOC:REPOS,ex:seg,text:last?"Descans llarg":"Descans"});
 });});
-let ctx;
-function beep(freq=880,dur=0.15,n=1){if(!ctx)return;for(let i=0;i<n;i++){const t=ctx.currentTime+i*(dur+0.08);const o=ctx.createOscillator(),g=ctx.createGain();o.type="square";o.frequency.value=freq;g.gain.setValueAtTime(1,t);g.gain.setValueAtTime(0,t+dur);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+dur);}if(navigator.vibrate)navigator.vibrate(200);}
+let nTreball=0;passos.forEach(p=>{if(p.tipus=="treball")p.num=++nTreball;});
+const TOTAL=passos.reduce((s,p)=>s+p.dur,0);
+const ORDRE=BLOCS.flat();
+
+/* ---------- So (optimitzat per a l'altaveu de l'iPhone) ---------- */
+let ctx,bus;
+function iniciaSo(){
+ // iOS 17+: el so web sona encara que l'interruptor de silenci estigui activat
+ try{if(navigator.audioSession)navigator.audioSession.type="playback";}catch(e){}
+ if(!ctx){
+  ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const comp=ctx.createDynamicsCompressor();
+  comp.threshold.value=-18;comp.knee.value=6;comp.ratio.value=8;comp.attack.value=.002;comp.release.value=.1;
+  const mk=ctx.createGain();mk.gain.value=1.8;
+  bus=ctx.createGain();bus.gain.value=1;
+  bus.connect(comp).connect(mk).connect(ctx.destination);
+  const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0);
+ }
+ if(ctx.state!="running")ctx.resume();
+}
+// Freqüències entre 1,3 i 2,6 kHz: és on l'altaveu de l'iPhone 12 sona més fort
+function beep(freq=1800,dur=.15,n=1){
+ if(!ctx)return;
+ for(let i=0;i<n;i++){
+  const t=ctx.currentTime+.02+i*(dur+.09);
+  [freq,freq*1.5].forEach((f,j)=>{
+   const o=ctx.createOscillator(),g=ctx.createGain();
+   o.type=j?"triangle":"square";o.frequency.value=f;
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(j?.5:.9,t+.006);
+   g.gain.setValueAtTime(j?.5:.9,t+dur-.02);g.gain.linearRampToValueAtTime(0,t+dur);
+   o.connect(g).connect(bus);o.start(t);o.stop(t+dur+.01);
+  });
+ }
+}
 let veu=null;
-function triaVeu(){const v=speechSynthesis.getVoices();veu=v.find(x=>x.lang.startsWith("ca"))||v.find(x=>x.lang.startsWith("es"))||null;}
+function triaVeu(){const v=speechSynthesis.getVoices();
+ veu=v.find(x=>x.lang.replace("_","-").startsWith("ca"))||v.find(x=>x.lang.replace("_","-")=="es-ES")||v.find(x=>x.lang.startsWith("es"))||null;}
 speechSynthesis.onvoiceschanged=triaVeu;triaVeu();
-function diu(t){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);if(veu){u.voice=veu;u.lang=veu.lang}else u.lang="ca-ES";u.volume=1;u.rate=1.05;speechSynthesis.speak(u);}
-let idx=0,rest=0,timer=null,pausat=false,wake=null;
+function diu(t){
+ // a Safari, cancel() just abans de speak() a vegades fa perdre la frase: només si cal
+ if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t);
+ if(veu){u.voice=veu;u.lang=veu.lang}else u.lang="ca-ES";
+ u.volume=1;u.rate=1.05;u.pitch=1.05;
+ setTimeout(()=>speechSynthesis.speak(u),30);
+}
+
+/* ---------- Estat ---------- */
+let estat="inici",idx=0,rest=0,pausat=false,lastTick=0,pauseFrac=0,wake=null,loop=null;
 const $=id=>document.getElementById(id);
-function mostra(p){const e=EX[p.ex];document.body.className=p.tipus;$("fase").textContent=p.tipus=="treball"?e.nom:p.text;$("info").textContent=p.info;$("seg").textContent=p.tipus=="treball"?e.consell:"Següent: "+e.nom;const im=$("img");im.onerror=()=>{im.onerror=null;im.src=e.svg};im.src=e.img;im.style.opacity=p.tipus=="treball"?1:0.5;}
-function inicia(i){idx=i;const p=passos[i];rest=p.dur;mostra(p);pinta();const e=EX[p.ex];
- if(p.tipus=="treball"){beep(1200,0.4);diu(`Comença. ${e.nom}. ${p.dur} segons.`);}
- else{beep(600,0.3,2);diu(i==0?`Prepara't. Comencem amb ${e.nom}`:`${p.text}. ${p.dur} segons. Després, ${e.nom}`);}}
-function pinta(){$("temps").textContent=rest;$("prog").style.width=(100*(passos[idx].dur-rest)/passos[idx].dur)+"%";}
-function tic(){if(pausat)return;rest--;pinta();
+const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+const totalRest=()=>rest+passos.slice(idx+1).reduce((s,p)=>s+p.dur,0);
+
+function pintaTira(){
+ const p=passos[idx],ara=estat=="inici"?passos[1].ex:p.ex;
+ $("strip").innerHTML=ORDRE.map(k=>{
+  const fet=estat=="fi"||(estat=="run"&&!passos.slice(idx).some(q=>q.tipus=="treball"&&q.ex==k));
+  const cls=fet?"fet":k==ara?(p.tipus=="treball"&&estat=="run"?"act":"seg"):"";
+  return `<div class="${cls}" title="${EX[k].nom}">${figura(k,false).replace("<img","<img style='border-radius:50%'")}</div>`;
+ }).join("");
+}
+function mostra(){
+ const p=estat=="inici"?passos[1]:passos[idx],e=EX[p.ex],treb=p.tipus=="treball";
+ document.body.className=estat=="fi"?"fi":estat=="inici"?"prep":p.tipus;
+ document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.body).getPropertyValue("--bg").trim();
+ if(estat=="fi"){
+  $("nom").textContent="Fet! 💪";$("consell").textContent="Entrenament completat";$("info").textContent=`${nTreball} exercicis · ${mmss(TOTAL)}`;
+  $("fig").innerHTML="";$("temps").textContent="✓";$("pas").textContent="Molt bé";$("total").textContent="0:00";
+ }else{
+  $("fig").innerHTML=figura(p.ex,treb&&estat=="run");
+  $("fig").classList.toggle("dim",!treb);
+  if(estat=="inici"){$("nom").textContent="Preparat?";$("consell").textContent=`Primer: ${e.nom}`;$("info").textContent=`3 blocs × 4 minuts · ${nTreball} exercicis`;$("pas").textContent="Total";}
+  else if(treb){$("nom").textContent=e.nom;$("consell").textContent=e.consell;$("info").textContent=p.info;$("pas").textContent=`Exercici ${p.num} de ${nTreball}`;}
+  else{$("nom").textContent=p.text;$("consell").textContent=`Següent: ${e.nom}`;$("info").textContent=e.consell;
+   const nx=passos.slice(idx).find(q=>q.tipus=="treball");$("pas").textContent=nx?`Descans · després ${nx.num}/${nTreball}`:"Descans";}
+ }
+ pintaTira();pintaNum();
+}
+function refresca(){mostra();}
+function pintaNum(){
+ if(estat=="fi")return;
+ if(estat=="inici"){$("temps").textContent=passos[1].dur;$("total").textContent=mmss(TOTAL);return;}
+ $("temps").textContent=rest;$("total").textContent=mmss(totalRest());
+ document.body.classList.toggle("compte",rest<=5&&!pausat);
+}
+function dibuixa(){
+ let ex=1,tt=1;
+ if(estat=="run"){
+  const frac=pausat?pauseFrac:Math.min(1,(performance.now()-lastTick)/1000);
+  ex=Math.max(0,(rest-frac)/passos[idx].dur);tt=Math.max(0,(totalRest()-frac)/TOTAL);
+ }else if(estat=="fi"){ex=0;tt=0;}
+ $("ringEx").style.strokeDashoffset=100*(1-ex);$("ringTot").style.strokeDashoffset=100*(1-tt);
+ $("ringEx").style.opacity=ex>0.003?1:0;$("ringTot").style.opacity=tt>0.003?1:0;
+ requestAnimationFrame(dibuixa);
+}
+
+function inicia(i){
+ idx=i;const p=passos[i];rest=p.dur;lastTick=performance.now();pauseFrac=0;mostra();
+ const e=EX[p.ex];
+ if(p.tipus=="treball"){beep(2000,.45);diu(`Comença. ${e.nom}. ${p.dur} segons.`);}
+ else{beep(1300,.25,2);diu(i==0?`Prepara't. Comencem amb ${e.nom}`:`${p.text}. ${p.dur} segons. Després, ${e.nom}`);}
+}
+function tic(silenci){
+ rest--;lastTick+=1000;
  if(rest<=0){if(idx+1<passos.length)inicia(idx+1);else fi();return;}
- if(rest<=5){beep(rest==1?1000:800,0.15);diu(String(rest));}
- else if(rest%10==0){beep(700,0.12);diu(`Queden ${rest} segons`);}}
-function fi(){clearInterval(timer);timer=null;document.body.className="";$("fase").textContent="Fet! 💪";$("temps").textContent="✓";$("seg").textContent="";$("info").textContent="Entrenament completat";$("prog").style.width="100%";beep(1000,0.3,3);diu("Entrenament acabat. Molt bé!");$("start").style.display="";$("start").textContent="↻ TORNAR A COMENÇAR";$("pausa").style.display="none";$("salta").style.display="none";if(wake)wake.release().catch(()=>{});}
-$("start").onclick=async()=>{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();ctx.resume();diu(" ");try{wake=await navigator.wakeLock.request("screen")}catch(e){}
- $("start").style.display="none";$("pausa").style.display="";$("salta").style.display="";pausat=false;$("pausa").textContent="⏸ Pausa";inicia(0);clearInterval(timer);timer=setInterval(tic,1000);};
-$("pausa").onclick=()=>{pausat=!pausat;$("pausa").textContent=pausat?"▶ Continua":"⏸ Pausa";diu(pausat?"Pausa":"Continuem");};
-$("salta").onclick=()=>{if(idx+1<passos.length)inicia(idx+1);else fi();};
-document.addEventListener("visibilitychange",async()=>{if(document.visibilityState=="visible"&&timer){try{wake=await navigator.wakeLock.request("screen")}catch(e){}}});
-mostra(passos[1]);
+ pintaNum();
+ if(silenci)return;
+ if(rest<=5){beep(rest==1?2600:1800,rest==1?.3:.16);diu(String(rest));}
+ else if(rest%10==0){beep(1500,.12);diu(`Queden ${rest} segons`);}
+}
+function rellotge(){
+ if(estat!="run"||pausat)return;
+ const now=performance.now();
+ if(now-lastTick>5000){while(estat=="run"&&now-lastTick>=2000)tic(true);} // tornada de segon pla
+ if(estat=="run"&&now-lastTick>=1000)tic(false);
+}
+function fi(){
+ estat="fi";clearInterval(loop);loop=null;document.body.classList.remove("compte");mostra();
+ beep(2000,.3,3);diu("Entrenament acabat. Molt bé!");
+ $("start").classList.remove("hide");$("start").textContent="↻ TORNAR A COMENÇAR";$("salta").classList.add("hide");
+ $("pausa").disabled=true;$("reset").disabled=true;if(wake)wake.release().catch(()=>{});
+}
+function reinicia(){
+ estat="inici";clearInterval(loop);loop=null;pausat=false;speechSynthesis.cancel();
+ document.body.classList.remove("compte","pausat");$("app").classList.remove("pausat");
+ $("start").classList.remove("hide");$("start").textContent="▶ COMENÇAR";$("salta").classList.add("hide");
+ $("prova").classList.remove("hide");$("avis").classList.remove("hide");
+ $("pausa").disabled=true;$("reset").disabled=true;iconaPausa();mostra();
+ if(wake)wake.release().catch(()=>{});
+}
+function iconaPausa(){$("icPausa").innerHTML=pausat?'<path d="M7 4.5v15l13-7.5z"/>':'<rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/>';}
+async function demanaWake(){try{wake=await navigator.wakeLock.request("screen")}catch(e){}}
+
+$("start").onclick=()=>{
+ iniciaSo();diu(" ");demanaWake();
+ estat="run";pausat=false;iconaPausa();
+ $("start").classList.add("hide");$("salta").classList.remove("hide");$("prova").classList.add("hide");$("avis").classList.add("hide");
+ $("pausa").disabled=false;$("reset").disabled=false;
+ inicia(0);clearInterval(loop);loop=setInterval(rellotge,100);
+};
+$("pausa").onclick=()=>{
+ if(estat!="run")return;
+ if(!pausat){pauseFrac=Math.min(.999,(performance.now()-lastTick)/1000);pausat=true;}
+ else{lastTick=performance.now()-pauseFrac*1000;pausat=false;}
+ $("app").classList.toggle("pausat",pausat);iconaPausa();pintaNum();diu(pausat?"Pausa":"Continuem");
+};
+$("salta").onclick=()=>{if(estat!="run")return;pausat=false;$("app").classList.remove("pausat");iconaPausa();if(idx+1<passos.length)inicia(idx+1);else fi();};
+$("reset").onclick=()=>{if(estat=="run"&&confirm("Vols aturar i reiniciar l'entrenament?"))reinicia();};
+$("prova").onclick=()=>{iniciaSo();beep(2000,.3);setTimeout(()=>diu(veu?`Hola! Aquesta és la veu de l'entrenament.`:"Hola! Prova de so."),450);};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState=="visible"){if(ctx&&ctx.state!="running")ctx.resume();if(estat=="run")demanaWake();}});
+
+mostra();requestAnimationFrame(dibuixa);
 </script>
 </body>
 </html>
